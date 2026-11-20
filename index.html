@@ -456,15 +456,6 @@
             </div>
           </div>
         </div>
-
-        <div class="arch-box">
-<span class="comment">// Simplified flow</span>
-Phone ──GET /load?url=…&w=360&h=640──▶ Server (Chromium + Playwright)
-Phone ◀── gzip JSON display list ────── Server
-Phone ──GET /tap?sid=…&x=120&y=340───▶ Server
-Phone ◀── updated display list ──────── Server
-Phone ──GET /img?sid=…&id=42&tw=320──▶ Server (JPEG, downscaled)
-        </div>
       </div>
     </section>
 
