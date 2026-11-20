@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://danltech.github.io/dt-mini-browser/sitemap.xml

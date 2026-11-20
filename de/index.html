@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DT Mini Browser – Winziger Android-Client + echter Chromium-Server</title>
+  <meta name="description" content="DT Mini Browser: Extrem leichter Android-Browser (ab Android 4.1), der die gesamte Darstellung an einen selbst gehosteten Chromium-Server auslagert. Kein WebView, kein Ballast, volle moderne Web-Unterstützung. Nur Self-Hosting – keine öffentlichen Server.">
+  <meta name="keywords" content="DT Mini Browser, Android Browser, leichter Browser, Chromium Server, selbst gehosteter Browser, altes Android, Privacy Browser, Thin Client Browser, DanlTech">
+  <meta name="author" content="DanlTech">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://danltech.github.io/dt-mini-browser/de/">
+  
+  <!-- Hreflang -->
+  <link rel="alternate" hreflang="en" href="https://danltech.github.io/dt-mini-browser/">
+  <link rel="alternate" hreflang="de" href="https://danltech.github.io/dt-mini-browser/de/">
+  <link rel="alternate" hreflang="x-default" href="https://danltech.github.io/dt-mini-browser/">
+
+  <!-- Open Graph / Discord / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://danltech.github.io/dt-mini-browser/de/">
+  <meta property="og:title" content="DT Mini Browser – Winziger Android-Client + echter Chromium-Server">
+  <meta property="og:description" content="Extrem leichter Android-Browser (ab Android 4.1), der echten Chromium auf deinem eigenen Server nutzt. Kein WebView, winzige APK, volle JS/CSS-Unterstützung. Nur Self-Hosting – es gibt keine öffentlichen Server.">
+  <meta property="og:image" content="https://danltech.github.io/dt-mini-browser/og-image.jpg">
+  <meta property="og:image:width" content="1176">
+  <meta property="og:image:height" content="784">
+  <meta property="og:site_name" content="DT Mini Browser">
+  <meta property="og:locale" content="de_DE">
+  <meta property="og:locale:alternate" content="en_US">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DT Mini Browser – Winziger Android-Client + echter Chromium-Server">
+  <meta name="twitter:description" content="Extrem leichter Android-Browser, der die Darstellung an deinen eigenen Chromium-Server auslagert. Läuft auf uralten Handys. Nur Self-Hosting.">
+  <meta name="twitter:image" content="https://danltech.github.io/dt-mini-browser/og-image.jpg">
+
+  <!-- Theme color -->
+  <meta name="theme-color" content="#0b1220">
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "DT Mini Browser",
+    "applicationCategory": "BrowserApplication",
+    "operatingSystem": "Android 4.1+",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "EUR"
+    },
+    "description": "Extrem leichter Android-Browser-Client, der mit einem selbst gehosteten Chromium-Rendering-Server kommuniziert. Kein WebView in der App.",
+    "softwareVersion": "1.0-beta",
+    "author": {
+      "@type": "Organization",
+      "name": "DanlTech",
+      "url": "https://github.com/danltech"
+    },
+    "codeRepository": [
+      "https://github.com/danltech/dt-mini-browser-android",
+      "https://github.com/danltech/dt-mini-browser-server"
+    ],
+    "license": [
+      "https://www.apache.org/licenses/LICENSE-2.0",
+      "https://www.gnu.org/licenses/agpl-3.0.html"
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --bg: #0b1220;
+      --bg-card: #131c2e;
+      --bg-card-hover: #1a2640;
+      --text: #e8eef8;
+      --text-muted: #9aabc4;
+      --accent: #5eead4;
+      --accent2: #a78bfa;
+      --accent-soft: rgba(94, 234, 212, 0.12);
+      --border: rgba(148, 163, 184, 0.15);
+      --danger: #f87171;
+      --warning: #fbbf24;
+      --radius: 16px;
+      --shadow: 0 8px 32px rgba(0,0,0,0.35);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      font-size: 1.05rem;
+    }
+
+    a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: #99f6e4; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* Header */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(11, 18, 32, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.9rem 0; gap: 1rem;
+    }
+    .logo {
+      font-weight: 700; font-size: 1.2rem; color: var(--text);
+      display: flex; align-items: center; gap: 0.55rem;
+    }
+    .logo span { color: var(--accent); }
+    .nav { display: flex; gap: 1.4rem; align-items: center; flex-wrap: wrap; }
+    .nav a { color: var(--text-muted); font-size: 0.95rem; font-weight: 500; }
+    .nav a:hover { color: var(--text); }
+    .lang-switch {
+      display: flex; gap: 0.35rem; font-size: 0.85rem;
+      background: var(--bg-card); border-radius: 999px; padding: 0.25rem;
+      border: 1px solid var(--border);
+    }
+    .lang-switch a {
+      padding: 0.3rem 0.7rem; border-radius: 999px; color: var(--text-muted);
+    }
+    .lang-switch a.active {
+      background: var(--accent-soft); color: var(--accent); font-weight: 600;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 5rem 0 4rem;
+      text-align: center;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(94, 234, 212, 0.15), transparent),
+        radial-gradient(ellipse 60% 40% at 80% 10%, rgba(167, 139, 250, 0.1), transparent);
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-weight: 800; letter-spacing: -0.03em;
+      margin-bottom: 1rem; line-height: 1.15;
+    }
+    .hero h1 span { 
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero .tagline {
+      font-size: 1.25rem; color: var(--text-muted); max-width: 640px;
+      margin: 0 auto 1.8rem;
+    }
+    .badge {
+      display: inline-block; font-size: 0.8rem; font-weight: 600;
+      padding: 0.3rem 0.85rem; border-radius: 999px;
+      background: var(--accent-soft); color: var(--accent);
+      border: 1px solid rgba(94, 234, 212, 0.25);
+      margin-bottom: 1.5rem;
+    }
+    .cta-row {
+      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.85rem 1.6rem; border-radius: 12px;
+      font-weight: 600; font-size: 1rem;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary {
+      background: linear-gradient(135deg, #2dd4bf, #5eead4);
+      color: #0b1220; box-shadow: 0 4px 20px rgba(94, 234, 212, 0.3);
+    }
+    .btn-primary:hover { color: #0b1220; box-shadow: 0 6px 28px rgba(94, 234, 212, 0.45); }
+    .btn-secondary {
+      background: var(--bg-card); color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: var(--bg-card-hover); color: var(--text); }
+
+    .warning-banner {
+      max-width: 720px; margin: 2rem auto 0;
+      background: rgba(248, 113, 113, 0.1);
+      border: 1px solid rgba(248, 113, 113, 0.35);
+      border-radius: var(--radius);
+      padding: 1rem 1.4rem;
+      font-size: 0.95rem; color: #fecaca;
+      text-align: left;
+    }
+    .warning-banner strong { color: var(--danger); }
+
+    /* Sections */
+    section { padding: 4.5rem 0; }
+    section h2 {
+      font-size: 1.9rem; font-weight: 700; margin-bottom: 0.6rem;
+      letter-spacing: -0.02em;
+    }
+    section .section-lead {
+      color: var(--text-muted); margin-bottom: 2.5rem; max-width: 640px;
+    }
+
+    /* Feature grid */
+    .grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.4rem;
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.6rem;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .card:hover { background: var(--bg-card-hover); border-color: rgba(94, 234, 212, 0.2); }
+    .card .icon {
+      font-size: 1.7rem; margin-bottom: 0.8rem;
+    }
+    .card h3 {
+      font-size: 1.15rem; margin-bottom: 0.5rem; font-weight: 650;
+    }
+    .card p { color: var(--text-muted); font-size: 0.97rem; }
+
+    /* How it works */
+    .steps {
+      display: grid; gap: 1.5rem;
+      counter-reset: step;
+    }
+    .step {
+      display: grid; grid-template-columns: auto 1fr; gap: 1.2rem;
+      align-items: start;
+    }
+    .step-num {
+      width: 42px; height: 42px; border-radius: 12px;
+      background: var(--accent-soft); color: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 1.1rem;
+      border: 1px solid rgba(94, 234, 212, 0.25);
+    }
+    .step h3 { margin-bottom: 0.3rem; font-size: 1.1rem; }
+    .step p { color: var(--text-muted); font-size: 0.97rem; }
+
+    /* Architecture */
+    .arch-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-top: 1.5rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      line-height: 1.5;
+    }
+    .arch-box .comment { color: #64748b; }
+    .arch-box .highlight { color: var(--accent); }
+
+    /* Security box */
+    .security {
+      background: linear-gradient(135deg, rgba(248, 113, 113, 0.08), rgba(251, 191, 36, 0.06));
+      border: 1px solid rgba(248, 113, 113, 0.3);
+      border-radius: var(--radius);
+      padding: 2rem;
+    }
+    .security h2 { color: #fecaca; }
+    .security ul { margin: 1rem 0 0 1.2rem; color: var(--text-muted); }
+    .security li { margin-bottom: 0.55rem; }
+
+    /* CTA final */
+    .final-cta {
+      text-align: center;
+      background: radial-gradient(ellipse at center, rgba(94, 234, 212, 0.1), transparent 70%);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Footer */
+    footer {
+      padding: 3rem 0 2.5rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    .footer-inner {
+      display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1.5rem;
+    }
+    .footer-links { display: flex; gap: 1.3rem; flex-wrap: wrap; }
+    .footer-links a { color: var(--text-muted); }
+    .footer-links a:hover { color: var(--accent); }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .hero { padding: 3.5rem 0 3rem; }
+      .nav { gap: 0.8rem; }
+      section { padding: 3.2rem 0; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-inner">
+      <a href="/de/" class="logo">DT <span>Mini Browser</span></a>
+      <nav class="nav">
+        <a href="#features">Funktionen</a>
+        <a href="#how">So funktioniert's</a>
+        <a href="#security">Sicherheit</a>
+        <a href="#get-started">Loslegen</a>
+        <div class="lang-switch">
+          <a href="../">EN</a>
+          <a href="./" class="active">DE</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container">
+        <div class="badge">Beta 1.0 · Nur Self-Hosting</div>
+        <h1>Ein <span>winziger</span> Android-Browser<br>mit <span>echtem Chromium</span></h1>
+        <p class="tagline">
+          Der Client ist reines Java, ohne Abhängigkeiten und läuft ab Android 4.1.<br>
+          Die gesamte Darstellung passiert auf einem Server, den <em>du</em> kontrollierst.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://github.com/danltech/dt-mini-browser-android" target="_blank" rel="noopener">
+            Android-Client →
+          </a>
+          <a class="btn btn-secondary" href="https://github.com/danltech/dt-mini-browser-server" target="_blank" rel="noopener">
+            Rendering-Server →
+          </a>
+        </div>
+
+        <div class="warning-banner">
+          <strong>Es gibt keine öffentlichen Server.</strong>
+          Du musst den Rendering-Server selbst betreiben (oder auf einer Maschine, der du vollständig vertraust).
+          Der Server sieht jede Seite, jede Formulareingabe und jedes Cookie seiner Nutzer.
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY -->
+    <section id="why">
+      <div class="container">
+        <h2>Warum DT Mini Browser?</h2>
+        <p class="section-lead">
+          Die meisten „leichten“ Android-Browser bringen trotzdem noch ein volles WebView oder Gecko mit. 
+          DT Mini Browser geht einen anderen Weg: Das Handy zeichnet nur, der Server macht die schwere Arbeit.
+        </p>
+
+        <div class="grid">
+          <div class="card">
+            <div class="icon">📱</div>
+            <h3>Läuft auf uralten Handys</h3>
+            <p>minSdk 16 (Android 4.1 Jelly Bean). Reines Java, kein AndroidX, kein Kotlin, kein WebView. Winzige APK.</p>
+          </div>
+          <div class="card">
+            <div class="icon">🌐</div>
+            <h3>Echtes modernes Web</h3>
+            <p>Der Server nutzt echten headless Chromium über Playwright. Volles JavaScript, CSS, Bilder, Formulare und komplexe Layouts funktionieren.</p>
+          </div>
+          <div class="card">
+            <div class="icon">🛡️</div>
+            <h3>Werbung & Tracker serverseitig geblockt</h3>
+            <p>DoubleClick, Google Analytics, Taboola, Facebook, Criteo und viele mehr werden gefiltert, bevor sie den Client erreichen.</p>
+          </div>
+          <div class="card">
+            <div class="icon">⚡</div>
+            <h3>Bandbreitenschonend</h3>
+            <p>Bilder werden auf dem Server verkleinert und als JPEG komprimiert. Zum Handy geht nur eine kompakte Display-Liste.</p>
+          </div>
+          <div class="card">
+            <div class="icon">🔒</div>
+            <h3>Du kontrollierst die Daten</h3>
+            <p>Lesezeichen und Verlauf bleiben auf dem Gerät. Keine Analytics, keine Accounts, kein Phone-Home. Du entscheidest, wo der Server läuft.</p>
+          </div>
+          <div class="card">
+            <div class="icon">🌍</div>
+            <h3>Viele Sprachen</h3>
+            <p>Client-UI: Englisch, Deutsch, Spanisch, Französisch, Italienisch, Türkisch, Russisch, Japanisch, Vereinfachtes Chinesisch.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" style="background: rgba(19,28,46,0.4);">
+      <div class="container">
+        <h2>Funktionen</h2>
+        <p class="section-lead">Alles, was man für den Alltag braucht – auf Hardware, die die meisten modernen Browser längst abgeschrieben haben.</p>
+
+        <div class="grid">
+          <div class="card">
+            <h3>Client (Android)</h3>
+            <p>
+              Tabs · Lesezeichen · Verlauf (lokal) · Formulareingabe · Downloads über den Server · 
+              HTTPS-Zertifikatsinfo · QR-Code-Setup · Unterstützung als Standardbrowser · 
+              Debug-Overlay · Pinch-Zoom & Fling · Kontextmenü bei langem Druck auf Links
+            </p>
+          </div>
+          <div class="card">
+            <h3>Server</h3>
+            <p>
+              Echter Chromium (Playwright) · Kompakte Display-Liste (Rechtecke, Text, Bilder, Links, Formularfelder) · 
+              Bild-Proxy mit Verkleinerung · Session-Handling (max. 4 parallel) · 
+              Cookie-Persistenz pro Client · Datei-Downloads (bis 80 MB) · SSRF-Schutz · DuckDuckGo-Such-Fallback
+            </p>
+          </div>
+          <div class="card">
+            <h3>Entwicklerfreundlich</h3>
+            <p>
+              Docker-Image fertig · Selbstsigniertes Zertifikat + Token werden automatisch erzeugt · 
+              Einfache REST-API · Server AGPL-3.0, Client Apache-2.0 · 
+              Klare Trennung der Verantwortlichkeiten
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="how">
+      <div class="container">
+        <h2>So funktioniert's</h2>
+        <p class="section-lead">Eine klassische Thin-Client-Architektur – aktualisiert für das moderne Web.</p>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div>
+              <h3>Du betreibst den Server</h3>
+              <p>Auf einem Linux-Rechner, Raspberry Pi, Windows-PC oder in Docker. Der Server startet einen headless Chromium und stellt eine kleine JSON-API bereit (Standard-Port 8080).</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div>
+              <h3>Handy verbindet sich per QR oder Adresse</h3>
+              <p>Beim ersten Start erzeugt der Server ein Token, optional ein selbstsigniertes Zertifikat und einen QR-Code. Diesen in der App scannen oder den Setup-Text einfügen. Der Client speichert Server-URL + Token.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div>
+              <h3>Server rendert, Client zeichnet</h3>
+              <p>Beim Öffnen einer URL lädt der Server die Seite in echtem Chromium, extrahiert das fertige Layout in eine kompakte Display-Liste (Rechtecke, Textzeilen, Bilder, Link-Flächen, Formularfelder) und schickt sie als gzip-JSON. Die Android-App malt sie nur noch – kein WebView nötig.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div>
+              <h3>Interaktion bleibt flüssig</h3>
+              <p>Taps, Tippen und Zurück-Navigation werden als einfache Befehle geschickt. Der Server aktualisiert den Seitenzustand und liefert eine neue Display-Liste. Bilder werden bei Bedarf angefordert und stark komprimiert.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="arch-box">
+<span class="comment">// Vereinfachter Ablauf</span>
+Handy ──GET /load?url=…&w=360&h=640──▶ Server (Chromium + Playwright)
+Handy ◀── gzip-JSON Display-Liste ──── Server
+Handy ──GET /tap?sid=…&x=120&y=340───▶ Server
+Handy ◀── aktualisierte Display-Liste ─ Server
+Handy ──GET /img?sid=…&id=42&tw=320──▶ Server (JPEG, verkleinert)
+        </div>
+      </div>
+    </section>
+
+    <!-- SECURITY -->
+    <section id="security">
+      <div class="container">
+        <div class="security">
+          <h2>⚠ Sicherheit & Privatsphäre – bitte lesen</h2>
+          <ul>
+            <li><strong>Es gibt keine offiziellen öffentlichen Server.</strong> Wer einen „öffentlichen DT-Mini-Browser-Server“ anbietet, hat nichts mit dem Projekt zu tun.</li>
+            <li>Der Server sieht <em>alles</em>, was du browsest – inklusive Formulardaten, in Seiten eingegebene Passwörter und Cookies.</li>
+            <li>Betreibe den Server nur auf Hardware, die du kontrollierst, oder für Personen, die dir vollständig vertrauen.</li>
+            <li>Bevorzuge HTTPS + Token + VPN (WireGuard / Tailscale) oder einen Reverse-Proxy. Öffne Port 8080 nicht einfach ins Internet.</li>
+            <li>Aktiviere niemals <code>MINI_ALLOW_PRIVATE=1</code> auf einem Server, den andere erreichen können (deaktiviert den Schutz vor internen Netzwerken).</li>
+            <li>Lesezeichen und Verlauf bleiben auf dem Gerät. Die App verlangt nur die INTERNET-Berechtigung (plus Speicher für Downloads auf älteren Android-Versionen).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- GET STARTED -->
+    <section id="get-started">
+      <div class="container">
+        <h2>Loslegen</h2>
+        <p class="section-lead">Zwei Repositories. Ein Server, ein Client. Beide Open Source.</p>
+
+        <div class="grid">
+          <div class="card">
+            <h3>1. Rendering-Server</h3>
+            <p style="margin-bottom:1rem;">Python + Playwright + Chromium. Docker oder Bare Metal.</p>
+            <a class="btn btn-secondary" href="https://github.com/danltech/dt-mini-browser-server" target="_blank" rel="noopener">
+              github.com/danltech/dt-mini-browser-server
+            </a>
+            <p style="margin-top:1rem;font-size:0.9rem;color:var(--text-muted);">
+              Lizenz: AGPL-3.0<br>
+              Schnellstart: <code>docker compose up -d</code>
+            </p>
+          </div>
+          <div class="card">
+            <h3>2. Android-Client</h3>
+            <p style="margin-bottom:1rem;">Reines Java, minSdk 16, keine Abhängigkeiten. APK aus den Releases oder selbst bauen.</p>
+            <a class="btn btn-secondary" href="https://github.com/danltech/dt-mini-browser-android" target="_blank" rel="noopener">
+              github.com/danltech/dt-mini-browser-android
+            </a>
+            <p style="margin-top:1rem;font-size:0.9rem;color:var(--text-muted);">
+              Lizenz: Apache-2.0<br>
+              Bauen: <code>./gradlew assembleRelease</code>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="final-cta">
+      <div class="container">
+        <h2>Bereit für den dünnsten modernen Browser?</h2>
+        <p class="section-lead" style="margin:0 auto 1.8rem;">Server selbst hosten, Client installieren, QR-Code scannen – und auf Hardware browsen, die alle anderen aufgegeben haben.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://github.com/danltech/dt-mini-browser-server" target="_blank" rel="noopener">Mit dem Server starten</a>
+          <a class="btn btn-secondary" href="https://github.com/danltech/dt-mini-browser-android" target="_blank" rel="noopener">Android-App holen</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <div>
+        <strong style="color:var(--text);">DT Mini Browser</strong> von DanlTech<br>
+        Unabhängiges Projekt – nicht verbunden mit Opera oder anderen Browser-Herstellern.
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/danltech/dt-mini-browser-android">Android</a>
+        <a href="https://github.com/danltech/dt-mini-browser-server">Server</a>
+        <a href="https://github.com/danltech">DanlTech</a>
+        <a href="../">English</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
